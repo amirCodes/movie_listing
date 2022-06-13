@@ -5,27 +5,28 @@
             {{ session('status') }}
         </div>
         @endif
-        <form method="post" action="/listings" enctype="multipart/form-data">
+        <form method="POST" action="/listings/{{$listing->id}}" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
             <!-- csrf is used to prevents cross-site scripting attacks/ block other users to submit to your endpoint -->
             <div class="col-md-6">
                 <label for="inputName" class="form-label">Name</label>
-                <!-- {{old('inputName')}}: will help to keep the older user input data.. -->
-                <input type="text" class="form-control" name="inputName" value="{{old('inputName')}}" placeholder="name..." />
+                
+                <input type="text" class="form-control" name="inputName" value="{{$listing->name}}" placeholder="name..." />
                 @error('inputName')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-md-6">
                 <label for="inputYOR" class="form-label">Year of release</label>
-                <input type="date" class="form-control" name="inputYOR" placeholder="14/08/2022" />
+                <input type="date" class="form-control" name="inputYOR" value="{{$listing->YOR}}"  />
                 @error('inputYOR')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-6">
                 <label for="inputPlot" class="form-label">Plot</label>
-                <input type="text" class="form-control" name="inputPlot" placeholder="plote..." />
+                <input type="text" class="form-control" name="inputPlot" value="{{$listing->plot}}"  placeholder="plote..." />
                 @error('inputPlot')
                 <p class="error">{{$message}}</p>
                 @enderror
@@ -35,7 +36,7 @@
                 <select name="inputProducer" class="form-select">
                     <option selected>Choose...</option>
                     @foreach($producers as $producer)
-                    <option value="{{$producer->id}}">{{$producer->name}}</option>
+                    <option value="{{$listing->id}}">{{$producer->name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -59,7 +60,8 @@
                 @enderror
             </div>
             <div class="col-12 mt-5">
-                <button type="submit" class="btn btn-primary">Add Listing</button>
+                <button type="submit" class="btn btn-primary">Update Listing</button>
+                <a href="/" class="btn btn-primary">Back</a>
             </div>
         </form>
     </div>

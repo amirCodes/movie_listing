@@ -1,6 +1,5 @@
 @if(session()->has('message'))
-<div x-data="{show: true}" x-init="setTimeout(() => show = false, 3000)" x-show="show"
-     class="alert alert-dark" role="alert">
+<div x-data="{show: true}" x-init="setTimeout(() => show = false, 3000)" x-show="show" class="alert alert-dark" role="alert">
   <p>
     {{session('message')}}
   </p>

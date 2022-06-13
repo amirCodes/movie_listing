@@ -18,7 +18,7 @@ class CreateListingsTable extends Migration
             $table->string('name');
             $table->string('YOR');
             $table->string('plot')->nullable();
-            $table->binary('poster');
+            $table->binary('poster')->nullable();
             $table->timestamps();
         });
     }
