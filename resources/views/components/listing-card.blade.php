@@ -16,9 +16,9 @@
         </div>
         <div class="card-body">
           <a href="/listings/{{$listing->id}}/edit" class="card-link text-success">Edit List</a>
-          <form method="POST" action="/listings/{{$listing->1}}">
-            @csrf
-            @method('DELETE')
+          <form method="POST" action="/listings/{{$listing->id}}">
+             @csrf
+             @method('DELETE')
             <a href="/listings/{{$listing->id}}/delete" class="card-link text-danger">Delete List</a>
           </form>
         </div>
