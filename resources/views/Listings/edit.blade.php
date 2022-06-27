@@ -10,30 +10,29 @@
             @method('PUT')
             <!-- csrf is used to prevents cross-site scripting attacks/ block other users to submit to your endpoint -->
             <div class="col-md-6">
-                <label for="inputName" class="form-label">Name</label>
-                
-                <input type="text" class="form-control" name="inputName" value="{{$listing->name}}" placeholder="name..." />
-                @error('inputName')
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" id="name" value="{{$listing->name}}" placeholder="name..." />
+                @error('name')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-md-6">
-                <label for="inputYOR" class="form-label">Year of release</label>
-                <input type="date" class="form-control" name="inputYOR" value="{{$listing->YOR}}"  />
-                @error('inputYOR')
+                <label for="YOR" class="form-label">Year of release</label>
+                <input type="date" class="form-control" name="YOR" id="YOR" value="{{$listing->YOR}}" />
+                @error('YOR')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-6">
-                <label for="inputPlot" class="form-label">Plot</label>
-                <input type="text" class="form-control" name="inputPlot" value="{{$listing->plot}}"  placeholder="plote..." />
-                @error('inputPlot')
+                <label for="plot" class="form-label">Plot</label>
+                <input type="text" class="form-control" name="plot" name="plot" value="{{$listing->plot}}" placeholder="plote..." />
+                @error('plot')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-md-6">
-                <label for="inputProducer" class="form-label">Producer</label>
-                <select name="inputProducer" class="form-select">
+                <label for="producer" class="form-label">Producer</label>
+                <select name="producer" id="producer" class="form-select">
                     <option selected>Choose...</option>
                     @foreach($producers as $producer)
                     <option value="{{$listing->id}}">{{$producer->name}}</option>
@@ -41,8 +40,8 @@
                 </select>
             </div>
             <div class="col-md-6">
-                <label for="inputActor" class="form-label">Actor(s)</label>
-                <select name="inputActor" class="form-select" multiple>
+                <label for="actor" class="form-label">Actor(s)</label>
+                <select name="actor" id="actor" class="form-select" multiple>
                     <option selected>Choose...</option>
                     @foreach($actors as $actor)
                     <option value="{{$actor->id}}">{{$actor->name}}</option>
@@ -53,9 +52,9 @@
                 </button>
             </div>
             <div class="col-md-4">
-                <label for="inputPoster" class="form-label">Poster</label>
-                <input type="file" class="form-control" name="inputPoster">
-                @error('inputPoster')
+                <label for="poster" class="form-label">Poster</label>
+                <input type="file" class="form-control" name="poster" id="poster">
+                @error('poster')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
@@ -105,6 +104,10 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript">
         $.ajaxSetup({
             headers: {
@@ -112,36 +115,69 @@
             }
         });
 
-        $(".btn-submit").click(function(e) {
+        $("#producerForm").on('submit', function(e) {
 
             e.preventDefault();
-
-            var name = $("#name").val();
-            var sex = $("#sex").val();
-            var DOB = $("#DOB").val();
-            var bio = $("#bio").val();
+            let name = $("#name").val();
+            let sex = $("#sex").val();
+            let DOB = $("#DOB").val();
+            let bio = $("#bio").val();
             console.log(name, sex, DOB, bio);
             $.ajax({
+                url: "/listings/create",
                 type: 'POST',
-                url: "",
                 data: {
                     name: name,
                     sex: sex,
                     DOB: DOB,
                     bio: bio
                 },
-                success: function(data) {
-                    console.log(data);
-                    if ($.isEmptyObject(data.error)) {
-                        alert(data.success);
-                        location.reload();
-                    } else {
-                        printErrorMsg(data.error);
+                success: function(response) {
+                    console.log('response' + response.success);
+                    if (response) {
+                        $('#success-message').text(response.success);
+                        //   $("#producersForm")[0].reset(); 
                     }
+                },
+                error: function(data) {
+                    console.log('error' + data.error);
+                    printErrorMsg(data.error);
+
                 }
             });
 
         });
+        $.ajax({
+            type: 'GET',
+            url: "/listings/create",
+            success: function(response) {
+                console.log('get data ' + response.data)
+                // appenddata = '<li>';
+                // if (typeof(response) == 'array') {
+                //     appenddata += response['name'];
+                // }
+                // appenddata += '</li>';
+                // $('.convo-body').append(appenddata);
+            }
+        });
+        /* When click show user */
+        $('body').on('click', '#show-producer', function() {
+            console.log('#show-producer')
+            // AJAX GET request
+            $.ajax({
+                url: 'getProducers',
+                type: 'get',
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response)
+                    //   createRows(response);
+
+                }
+            });
+        });
+
+
+
 
         function printErrorMsg(msg) {
             $(".print-error-msg").find("ul").html('');

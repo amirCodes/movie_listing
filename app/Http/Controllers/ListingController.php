@@ -8,6 +8,7 @@ use App\Models\Producers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+
 class ListingController extends Controller
 {
     // Show all listings
@@ -15,7 +16,23 @@ class ListingController extends Controller
     {
         return view('listings.index', ['listings' => Listing::latest()->get()]);
     }
-
+    //Show producers list
+    // public function showProducer(Producers $listings)
+    // {
+    //     // return view('listings.show', [
+    //     //     'listing' => $listing,
+    //     // ]);
+        
+    //     return response()->json($listings);
+    //     // return Response::json($listing);
+    // }
+    public function getProducer(){
+        $producers = Producers::orderby('id','asc')->select('*')->get(); 
+        // Fetch all records
+        $response['data'] = $producers;
+        //  dd($response);
+        return response()->json($response);
+      }
     //Show single listing
     public function show(Listing $listing)
     {
@@ -30,9 +47,34 @@ class ListingController extends Controller
         return view('listings.create', ['actors' => Actors::latest()->get(), 'producers' => Producers::latest()->get()]);
     }
 
+    // Store Producer data
+    public function createProducers(Request $request)
+    {
+        $request->validate([
+            'name'=> ['required', Rule::unique('listings', 'name')],
+            'sex' => 'required',
+            'DOB' => 'required',
+            'bio' => 'required',
+        ]);
+
+        $post = Producers::updateOrCreate(['id' => $request->id], [
+            'name' => $request->name,
+            'sex' => $request->sex,
+            'DOB' => $request->DOB,
+            'bio' => $request->bio,
+        ]);
+
+        return response()->json(['code' => 200, 'message' => 'Producer Created successfully', 'data' => $post], 200);
+    }
+
+    // Store Actors data
+    public function createActors(Request $request)
+    {
+    }
     // Store Listing Data
     public function store(Request $request)
     {
+        
         $formFields = $request->validate([
             'name' => ['required', Rule::unique('listings', 'name')],  //Name is required and it should be  unigue
             'YOR' => 'required',
@@ -42,6 +84,7 @@ class ListingController extends Controller
         if ($request->hasFile('poster')) {
             $formFields['poster'] = $request->file('poster')->store('posters', 'public');
         }
+    
         Listing::create($formFields);
 
         return redirect('/')->with('message', 'Listing created successfully!');

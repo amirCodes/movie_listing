@@ -18,35 +18,35 @@
             {{ session('status') }}
         </div>
         @endif
-        <form method="post" action="/listings" enctype="multipart/form-data">
+        <form method="POST" action="/listings" enctype="multipart/form-data">
             @csrf
             <!-- csrf is used to prevents cross-site scripting attacks/ block other users to submit to your endpoint -->
             <div class="col-md-6">
-                <label for="inputName" class="form-label">Name</label>
-                <!-- {{old('inputName')}}: will help to keep the older user input data.. -->
-                <input type="text" class="form-control" name="inputName" value="{{old('inputName')}}" placeholder="name..." />
-                @error('inputName')
+                <label for="name" class="form-label">Name</label>
+                <!-- {{old('name')}}: will help to keep the older user input data.. -->
+                <input type="text" class="form-control" name="name" id="name" value="{{old('name')}}" placeholder="name..." />
+                @error('name')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-md-6">
-                <label for="inputYOR" class="form-label">Year of release</label>
-                <input type="date" class="form-control" name="inputYOR" placeholder="14/08/2022" />
-                @error('inputYOR')
+                <label for="YOR" class="form-label">Year of release</label>
+                <input type="date" class="form-control" name="YOR" id="YOR" placeholder="14/08/2022" />
+                @error('YOR')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-6">
-                <label for="inputPlot" class="form-label">Plot</label>
-                <input type="text" class="form-control" name="inputPlot" placeholder="plote..." />
-                @error('inputPlot')
+                <label for="plot" class="form-label">Plot</label>
+                <input type="text" class="form-control" name="plot" id="plot" placeholder="plote..." />
+                @error('plot')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
             <div class="col-md-6">
                 <label for="inputProducer" class="form-label">Producer</label>
-                <select name="inputProducer" class="form-select">
-                    <option selected>Choose...</option>
+                <select name="inputProducer" class="form-select" id="show-producer">
+                    <option selected id="myoption">Choose...</option>
                     @foreach($producers as $producer)
                     <option value="{{$producer->id}}">{{$producer->name}}</option>
                     @endforeach
@@ -68,9 +68,9 @@
                 </button>
             </div>
             <div class="col-md-4">
-                <label for="inputPoster" class="form-label">Poster</label>
-                <input type="file" class="form-control" name="inputPoster">
-                @error('inputPoster')
+                <label for="poster" class="form-label">Poster</label>
+                <input type="file" class="form-control" name="poster" id="poster">
+                @error('poster')
                 <p class="error">{{$message}}</p>
                 @enderror
             </div>
@@ -90,8 +90,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="producerForm">
                         <div class="alert alert-danger print-error-msg" style="display:none">
+                            @if(Session::has('success'))
+                            <div class="alert alert-success">
+                                {{Session::get('success')}}
+                            </div>
+                            @endif
                             <ul></ul>
                         </div>
                         <div class="mb-3">
@@ -100,18 +105,18 @@
                         </div>
                         <div class="mb-3">
                             <label for="sex" class="form-label">Sex:</label>
-                            <input type="text" name="sex" class="form-control" id="sex"></input>
+                            <input type="text" id="sex" name="sex" class="form-control" id="sex"></input>
                         </div>
                         <div class="mb-3">
                             <label for="DOB" class="form-label">Date of beath:</label>
-                            <input type="date" name="DOB" class="form-control" id="DOB"></input>
+                            <input type="date" id="DOB" name="DOB" class="form-control" id="DOB"></input>
                         </div>
                         <div class="mb-3">
                             <label for="bio" class="form-label">Bio:</label>
-                            <input type="text" name="bio" class="form-control" id="bio"></input>
+                            <input type="text" id="bio" name="bio" class="form-control" id="bio"></input>
                         </div>
                         <div class="mb-3 text-center">
-                            <button class="btn btn-success btn-submit">Submit</button>
+                            <button class="btn btn-success btn-submit" name="submit" id="submit">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -156,8 +161,10 @@
             </div>
         </div>
     </div>
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript">
         $.ajaxSetup({
             headers: {
@@ -165,36 +172,69 @@
             }
         });
 
-        $(".btn-submit").click(function(e) {
+        $("#producerForm").on('submit', function(e) {
 
             e.preventDefault();
-
-            var name = $("#name").val();
-            var sex = $("#sex").val();
-            var DOB = $("#DOB").val();
-            var bio = $("#bio").val();
+            let name = $("#name").val();
+            let sex = $("#sex").val();
+            let DOB = $("#DOB").val();
+            let bio = $("#bio").val();
             console.log(name, sex, DOB, bio);
             $.ajax({
+                url: "/listings/create",
                 type: 'POST',
-                url: "",
                 data: {
                     name: name,
                     sex: sex,
                     DOB: DOB,
                     bio: bio
                 },
-                success: function(data) {
-                    console.log(data);
-                    if ($.isEmptyObject(data.error)) {
-                        alert(data.success);
-                        location.reload();
-                    } else {
-                        printErrorMsg(data.error);
+                success: function(response) {
+                    console.log('response' + response.success);
+                    if (response) {
+                        $('#success-message').text(response.success);
+                        //   $("#producersForm")[0].reset(); 
                     }
+                },
+                error: function(data) {
+                    console.log('error' + data.error);
+                    printErrorMsg(data.error);
+
                 }
             });
 
         });
+        $.ajax({
+            type: 'GET',
+            url: "/listings/create",
+            success: function(response) {
+                console.log('get data ' + response.data)
+                // appenddata = '<li>';
+                // if (typeof(response) == 'array') {
+                //     appenddata += response['name'];
+                // }
+                // appenddata += '</li>';
+                // $('.convo-body').append(appenddata);
+            }
+        });
+        /* When click show user */
+        $('body').on('click', '#show-producer', function() {
+            console.log('#show-producer')
+            // AJAX GET request
+            $.ajax({
+                url: "/listings/create",
+                type: 'POST',
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response)
+                    //   createRows(response);
+
+                }
+            });
+        });
+
+
+
 
         function printErrorMsg(msg) {
             $(".print-error-msg").find("ul").html('');
@@ -204,5 +244,4 @@
             });
         }
     </script>
-
 </x-layout>

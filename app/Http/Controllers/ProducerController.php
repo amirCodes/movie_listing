@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Producers;
 
+use function GuzzleHttp\Promise\all;
+
 class ProducerController extends Controller
 {
     public function index()
@@ -36,8 +38,10 @@ class ProducerController extends Controller
         }
        
         Producers::create([
-            'title' => $request->title,
-            'body' => $request->body,
+            'name' => $request->name,
+            'sex' => $request->sex,
+            'DOB' => $request->DOB,
+            'bio' => $request->bio,
         ]);
   
         return response()->json(['success' => 'List created successfully.']);
